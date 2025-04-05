@@ -95,7 +95,94 @@
        ;;  for `clojure.string/join` but `lein repl` runs this just fine
        (clojure.string/join ", " things)))
 
+(defn chooser
+  ;; Destructuring vector: this example accesses the first and second elements
+  ;; and throws out the rest of them.
+  ;; Had to prefix rest param ignore with _
+  [[first-choice second-choice & _ignore]]
+  (println (str "Your first choice is: " first-choice))
+  (println (str "Your second choice is: " second-choice))
+  (println "We're ignoring the rest of your choices."))
 
+(defn announce-treasure-location
+  ;; alternate syntax:
+  ;; get the values for the keys :lat and :lng
+  ;; [{lat :lat lng :lng}]
+  [{:keys [lat lng]}]
+  (println (str "Treasure lat: " lat))
+  (println (str "Treasure lng: " lng)))
+
+(defn illustrative-function
+  []
+  (+ 1 304)
+  30
+  "joe")
+
+(defn receive-treasure-location
+  ;; Destructure accessing values for particular keys, but also retain original map
+  ;; Do the variable names need to match the keywords?
+  ;; yes! I tried passing foo and bar to this fn and got nils back.
+  [{:keys [lat lng] :as treasure-location}]
+  (println (str "Treasure lat: " lat))
+  (println (str "Treasure lng: " lng))
+  (println (str "Thankyee fer this beautiful map: " treasure-location)))
+
+(def my-special-multiplier (fn [x] (* x 3)))
+(def itty-bitty-multiplier #(* % 4))
+
+;; higher-order fn example, returns an anon function
+(defn inc-maker
+  "Create a custom incrementor"
+  [inc-by]
+  #(+ % inc-by))
+
+;; Closure example, inc3 knows to increment by 3 even outside (def inc3) scope.
+(def inc3 (inc-maker 3))
+
+
+(def asym-hobbit-body-parts [{:name "head" :size 3}
+                             {:name "left-eye" :size 1}
+                             {:name "left-ear" :size 1}
+                             {:name "mouth" :size 1}
+                             {:name "nose" :size 1}
+                             {:name "neck" :size 2}
+                             {:name "left-shoulder" :size 3}
+                             {:name "left-upper-arm" :size 3}
+                             {:name "chest" :size 10}
+                             {:name "back" :size 10}
+                             {:name "left-forearm" :size 3}
+                             {:name "abdomen" :size 6}
+                             {:name "left-kidney" :size 1}
+                             {:name "left-hand" :size 2}
+                             {:name "left-knee" :size 2}
+                             {:name "left-thigh" :size 4}
+                             {:name "left-lower-leg" :size 3}
+                             {:name "left-achilles" :size 1}
+                             {:name "left-foot" :size 2}])
+
+(defn matching-part
+  [part] ;; part is a map data structure
+  ;; return a map with key :name equal to the resulting string after replacing left- with right-
+  ;; that was stored in the argument body part map's :name key
+  ;; also include a :size field with the same size as the input argument map's :size field.
+  {:name (clojure.string/replace (:name part) #"^left-" "right-")
+   :size (:size part)})
+
+(defn symmetrize-body-parts
+  "Expects a seq of maps that have a :name and :size"
+  [asym-body-parts]
+  (loop [remaining-asym-parts asym-body-parts
+         final-body-parts []]
+    (if (empty? remaining-asym-parts)
+      final-body-parts
+      (let [[part & remaining] remaining-asym-parts]
+        (recur remaining
+               (into final-body-parts
+                     (set [part (matching-part part)])))))))
+
+;; Understanding let
+;; QUESTION: When to use def vs. let?
+(def x 0)
 
 (defn ch3
   []
@@ -115,14 +202,36 @@
   ;; functions
   (println (no-params))
   (println (one-param 1))
+  (two-params 1 2)
   (println (x-punch "Kanye West"))
   (println (x-punch "Donald Trump" "Fascist" "Fuck"))
   (println (codger "random neighbors" "racing thoughts"))
   (println (favorite-things "sweetie" "vidya games" "couch"))
-  (two-params 1 2))
+  (chooser ["Marmalade", "Handsome Jack", "Pigpen", "Aquaman"])
+  (announce-treasure-location {:lat 28.22 :lng 81.33})
+  (receive-treasure-location {:foo 28.22 :bar 81.33})
+  (println (str "Return the last form evaluated in the fn scope: " (illustrative-function)))
+  ;; anonymous function example:
+  (println (str "Should be 24: " ((fn [x] (* x 3)) 8)))
+  ;; Use def with anonymous function, works just like a regular fn:
+  (println (str "Should be 21 with a def'd anonymous fn: " (my-special-multiplier 7)))
+  (println (str "Should be 32: " (itty-bitty-multiplier 8)))
+  (println (str "Anonymous fn using reader macro syntax with multiple args: "
+                (#(str %1 " and " %2) "cornbread" "butter beans")))
+  ;; AAAAGH TOO MANY SPECIAL CHARS... OWW MY BRAIN
+  (println (#(identity %&) 1 "blarg" :yip))
+  (println (inc3 7))
+  ;; Putting it all together
+  (println (str "Should be right-foot: " (matching-part {:name "left-foot" :size 2})))
+  (println (str "Should have left- and right- body parts: " (symmetrize-body-parts asym-hobbit-body-parts)))
+  ;; Understanding let
+  (println (str "4 times 0 equals : " (* x 4)))
+  (println (str "4 times x where x is now rebound to 2 in a new scope equals : "
+                (let [x (inc (inc x))] (* x 4))))
+  x)
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "I'm doing enough for now!"
   [& _args]
   (teapot)
   (ch3))
