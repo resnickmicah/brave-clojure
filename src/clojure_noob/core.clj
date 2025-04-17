@@ -176,6 +176,10 @@
     (if (empty? remaining-asym-parts)
       final-body-parts
       (let [[part & remaining] remaining-asym-parts]
+        ;; If we didn't use the above let binding, this is how the below would look:
+        ;; (recur (rest remaining-asym-parts) <-- interesting note: Clojure uses first and rest instead of car and cdr.
+        ;;        (into final-body-parts
+        ;;              (set [(first remaining-asym-parts) (matching-part (first remaining-asym-parts))])))
         (recur remaining
                (into final-body-parts
                      (set [part (matching-part part)])))))))
@@ -224,10 +228,18 @@
   ;; Putting it all together
   (println (str "Should be right-foot: " (matching-part {:name "left-foot" :size 2})))
   (println (str "Should have left- and right- body parts: " (symmetrize-body-parts asym-hobbit-body-parts)))
-  ;; Understanding let
+  ;; Understanding let 
+  ;; "So, let is a handy way to introduce local names for values, which helps simplify the code."
   (println (str "4 times 0 equals : " (* x 4)))
   (println (str "4 times x where x is now rebound to 2 in a new scope equals : "
                 (let [x (inc (inc x))] (* x 4))))
+  ;; Understanding into and sets
+  
+  ;; Trying to define a set with set literal syntax and duplicate elements is a syntax error:
+  ;; clojure-noob.core=> #{:a :a}
+  ;; Syntax error reading source at (REPL:1:9).
+  ;; Duplicate key: :a
+  (println (str "Adding :a twice to a set, then adding that to an empty vector: " (into [] (set [:a :a]))))
   x)
 
 (defn -main
