@@ -262,7 +262,7 @@
 ;; Answer: global binding -> def, local binding (temp name) -> let.
 (def x 0)
 
-(defn ch3
+(defn ch3-do-things
   []
   ;; I don't understand why a do isn't needed here...
   (println (+ 1 2 3))
@@ -319,8 +319,37 @@
   (recursive-printer)
   x)
 
+(defn titleize
+  [topic]
+  (str topic " for the Brave and True"))
+
+
+(defn ch4-core-fns-in-depth
+  []
+  (map titleize ["Hamsters" "Ragnarok"])
+  (map titleize '("Empathy" "Decorating"))
+  (map titleize #{"Elbows" "Soap Carving"})
+  (map #(titleize (second %)) {:uncomfortable-thing "Winking"})
+  ;; JavaScript linked list example
+  ;; var node3 = {
+  ;;   value: "last",
+  ;;   next: null
+  ;; };
+  ;; var node2 = {
+  ;;   value: "middle",
+  ;;   next: node3
+  ;; };
+
+  ;; var node1 = {
+  ;;   value: "first",
+  ;;   next: node2
+  ;; };
+)
+
 (defn -main
   "I'm doing enough for now!"
   [& _args]
-  (teapot)
-  (ch3))
+  ;; (teapot)
+  ;;  (ch3)
+  (ch4-core-fns-in-depth)
+  )
