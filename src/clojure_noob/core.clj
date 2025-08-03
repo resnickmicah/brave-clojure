@@ -344,6 +344,56 @@
   ;;   value: "first",
   ;;   next: node2
   ;; };
+  ;; Map can take multiple collections:
+  (map str ["a" "b" "c"] ["A" "B" "C"])
+  ; => ("aA" "bB" "cC")
+
+  (def human-consumption   [8.1 7.3 6.6 5.0])
+  (def critter-consumption [0.0 0.2 0.3 1.1])
+  (defn unify-diet-data
+    [human critter]
+    {:human human
+    :critter critter})
+  (map unify-diet-data human-consumption critter-consumption)
+
+  ;; When to define a function with def vs. defn?
+  ;; After a bit of googling, looks like def is just for quick one-offs
+  (def sum #(reduce + %))
+  (def avg #(/ (sum %) (count %)))
+
+  ;; defn allows for multi-arity functions, pre and post conditions, docstrings
+  (defn stats
+  [numbers]
+  (map #(% numbers) [sum count avg]))
+
+  (def identities
+  [{:alias "Batman" :real "Bruce Wayne"}
+   {:alias "Spider-Man" :real "Peter Parker"}
+   {:alias "Santa" :real "Your mom"}
+   {:alias "Easter Bunny" :real "Your dad"}])
+
+  ;; access :real key on each map in vector
+  (map :real identities)
+
+  ;; using reduce to iterate/map over a map
+  ;; giving new values for each key
+  (reduce (fn [new-map [key val]]
+          (assoc new-map key (inc val)))
+        {}
+        {:max 30 :min 10})
+  
+  ;; assoc takes three args: a map, a key, and a value
+  (assoc {:a 1} :b 2) ; => {:a 1 :b 2}
+
+  ;; using reduce like a filter to only keep key/value pairs that match
+  ;; a predicate -- in this case, if a value is greater than 4
+  (reduce (fn [new-map [key val]]
+          (if (> val 4)
+            (assoc new-map key val)
+            new-map))
+        {}
+        {:human 4.1
+         :critter 3.9})
 )
 
 (defn -main
